@@ -75,3 +75,6 @@ Last, goto https://shopee.tw/shopee-coins to own your shopee daily coin after lo
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
+
+## Donate
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/paypalme/joe159119)
