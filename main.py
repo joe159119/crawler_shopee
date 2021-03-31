@@ -81,15 +81,14 @@ class Driver(Config):
         chrome_options = Options()
 
         if not self.DEBUG or self.path == '/code':
-            chrome_options.add_experimental_option("detach", True)
+            # chrome_options.add_experimental_option("detach", True)
             chrome_options.add_argument('--headless')
             chrome_options.add_argument('--start-maximized')
             chrome_options.add_argument('disable-infobars')
             chrome_options.add_argument('--disable-extensions')
             chrome_options.add_argument('--no-sandbox')
             chrome_options.add_argument('--disable-dev-shm-usage')
-        self.driver = webdriver.Chrome(
-            executable_path="D:/progs/python/crawler_shopee/chromedriver.exe", options=chrome_options)
+        self.driver = webdriver.Chrome('chromedriver', options=chrome_options)
         self.driver.set_window_size(width, height)
         self.path = os.path.dirname(os.path.abspath(__file__))
         print("Init driver done.")
