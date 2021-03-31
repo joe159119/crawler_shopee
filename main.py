@@ -33,7 +33,7 @@ class Config:
     elements_by_text = {
         "LOGIN_SUBMIT": "//button[text()=\"登入\"]",
         "SMS_MODAL": "//div[contains(., '請輸入驗證碼')]",
-        "SMS_TEXT": "//input[contains(@type, 'tel')]",
+        "SMS_TEXT": "//input[contains(@autocomplete, 'one-time-code')]",
         "SMS_SUBMIT": "//button[contains(., '驗證') or contains(., '認證')]",
         "COIN_PAGE_READY": "//main/section/div/div[text()=\"蝦幣獎勵\"]",
         "GET_COIN": "//main/section/div/button",
