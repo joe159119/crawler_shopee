@@ -5,8 +5,8 @@ Shopee coin getter is a script to collect daily shopee coins.
 
 ![alt text](https://raw.githubusercontent.com/joe159119/crawler_shopee/master/readme/overall-1.png)
 
-## Preface:
-I saw charlie0227/crawler_shopee and thought it was great, 
+## Preface
+I saw [charlie0227](https://github.com/charlie0227)/[crawler_shopee](https://github.com/charlie0227/crawler_shopee) and thought it was great, 
 but after the Shopee website was updated, it became unavailable, 
 so I rewritten it to make it work normally.
 	
