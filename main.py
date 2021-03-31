@@ -24,11 +24,7 @@ class Config:
         "POP_MODAL": ".shopee-popup__close-btn",
         "AVATAR": ".shopee-avatar",
         "NAV_LOGIN_MODAL": ".navbar__link--account",
-        # "SMS_MODAL": ".shopee-authen__outline-button",
-        # "SMS_TEXT": ".shopee-authen .input-with-status__input",
-        # "SMS_SUBMIT": ".shopee-authen .btn-solid-primary",
         "LOGIN_FAILED": ".shopee-authen .shopee-authen__error"
-        "SMS": "form>div>div 請輸入驗證碼 您的驗證碼已透過SMS簡訊傳送至您的手機 51 秒後重新傳送 form>div>div>button認證"
     }
     elements_by_name = {
         "LOGIN_USER": "loginKey",
@@ -204,9 +200,9 @@ class Crawler(Driver, Config):
 
     def checkSMS(self):
         try:
-            self.wait_until("css", "SMS_MODAL")
-            smsText = self.find("css", "SMS_TEXT")
-            smsSubmit = self.find("css", "SMS_SUBMIT")
+            self.wait_until("text", "SMS_MODAL")
+            smsText = self.find("text", "SMS_TEXT")
+            smsSubmit = self.find("text", "SMS_SUBMIT")
 
             text_sms = input("Please Enter SMS code in 60 seconds: ")
             smsText.clear()
