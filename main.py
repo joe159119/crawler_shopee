@@ -32,7 +32,7 @@ class Config:
     }
     elements_by_text = {
         "LOGIN_SUBMIT": "//button[text()=\"登入\"]",
-        "SMS_MODAL": "//div[contains(string(), '請輸入驗證碼')",
+        "SMS_MODAL": "//div[contains(., '請輸入驗證碼')]",
         "SMS_TEXT": "//form/div/div/div/input[type()=\"tel\"]",
         "SMS_SUBMIT": "//button[contains(., '驗證')]",
         "COIN_PAGE_READY": "//main/section/div/div[text()=\"蝦幣獎勵\"]",
@@ -268,6 +268,7 @@ class Crawler(Driver, Config):
         if not self.checkLogin():
             self.loginByPass()
             if not self.checkLogin():
+                sleep(3)
                 self.checkSMS()
                 if not self.checkLogin():
                     self.close()
