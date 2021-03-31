@@ -33,9 +33,8 @@ class Config:
     elements_by_text = {
         "LOGIN_SUBMIT": "//button[text()=\"登入\"]",
         "SMS_MODAL": "//div[contains(., '請輸入驗證碼')]",
-        # "SMS_TEXT": "//form/div/div/div/input[type()=\"tel\"]",
         "SMS_TEXT": "//input[contains(@type, 'tel')]",
-        "SMS_SUBMIT": "//button[contains(., '驗證')]",
+        "SMS_SUBMIT": "//button[contains(., '驗證')||contains(., '認證')]",
         "COIN_PAGE_READY": "//main/section/div/div[text()=\"蝦幣獎勵\"]",
         "GET_COIN": "//main/section/div/button",
         "COIN_NOW": "//main/section/div/a/p",
@@ -212,7 +211,9 @@ class Crawler(Driver, Config):
 
             text_sms = input("Please Enter SMS code in 60 seconds: ")
             smsText.clear()
+            logger.info("send_keys smsText")
             smsText.send_keys(text_sms)
+            logger.info(smsText)
             smsSubmit.click()
             try:
                 self.wait_until("css", "AVATAR")
