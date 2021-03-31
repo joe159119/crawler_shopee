@@ -34,7 +34,7 @@ class Config:
         "LOGIN_SUBMIT": "//button[text()=\"登入\"]",
         "SMS_MODAL": "//div[contains(., '請輸入驗證碼')]",
         "SMS_TEXT": "//input[contains(@type, 'tel')]",
-        "SMS_SUBMIT": "//button[contains(., '驗證')||contains(., '認證')]",
+        "SMS_SUBMIT": "//button[contains(., '驗證') or contains(., '認證')]",
         "COIN_PAGE_READY": "//main/section/div/div[text()=\"蝦幣獎勵\"]",
         "GET_COIN": "//main/section/div/button",
         "COIN_NOW": "//main/section/div/a/p",
