@@ -5,7 +5,7 @@ import logging
 import datetime
 import inspect
 from env import *
-from time import gmtime, strftime,sleep
+from time import gmtime, strftime, sleep
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -13,6 +13,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+
 
 class Config:
 
@@ -23,23 +24,25 @@ class Config:
         "POP_MODAL": ".shopee-popup__close-btn",
         "AVATAR": ".shopee-avatar",
         "NAV_LOGIN_MODAL": ".navbar__link--account",
-        "LOGIN_SUBMIT": "#modal > aside > div > div > div > div > div > div > button:nth-child(2)",
         "SMS_MODAL": ".shopee-authen__outline-button",
         "SMS_TEXT": ".shopee-authen .input-with-status__input",
         "SMS_SUBMIT": ".shopee-authen .btn-solid-primary",
-        "LOGIN_FAILED": ".shopee-authen .shopee-authen__error",
-        "COIN_PAGE_READY": ".check-box",
-        "COIN_NOW": ".check-box .total-coins",
-        "GET_COIN": ".check-box .check-in-tip",
-        "COIN_REGULAR": ".check-box .top-btn.Regular"
+        "LOGIN_FAILED": ".shopee-authen .shopee-authen__error"
     }
     elements_by_name = {
         "LOGIN_USER": "loginKey",
         "LOGIN_PASS": "password"
     }
+    elements_by_text = {
+        "LOGIN_SUBMIT": "//button[text()=\"登入\"]",
+        "COIN_PAGE_READY": "//main/section/div/div[text()=\"蝦幣獎勵\"]",
+        "GET_COIN": "//main/section/div/button",
+        "COIN_NOW": "//main/section/div/a/p",
+        "COIN_REGULAR": "//button[contains(., '明天再回來領取')]"
+    }
     urls = {
         "INDEX": "https://shopee.tw",
-        "COIN_PAGE": "https://shopee.tw/shopee-coins-internal/?scenario=1"
+        "COIN_PAGE": "https://shopee.tw/shopee-coins"
     }
     path = os.path.dirname(os.path.abspath(__file__))
 
@@ -47,13 +50,15 @@ class Config:
 class Logger(Config):
     def __init__(self):
         path = os.path.join(self.path, self.LOGGING_PATH)
-        path = "{}/{}".format(path, datetime.datetime.now().strftime("shopee.%Y-%m.log"))
         if not os.path.exists(path):
             os.makedirs(path)
+        path = "{}/{}".format(path,
+                              datetime.datetime.now().strftime("shopee.%Y-%m.log"))
         logging_level = logging.DEBUG if self.DEBUG else logging.INFO
         logger = logging.getLogger()
         logger.setLevel(logging_level)
-        formatter = logging.Formatter('[%(filename)s:%(lineno)s - %(funcName)20s() ] %(asctime)s %(name)-12s %(levelname)-8s %(message)s')
+        formatter = logging.Formatter(
+            '[%(filename)s:%(lineno)s - %(funcName)20s() ] %(asctime)s %(name)-12s %(levelname)-8s %(message)s')
         ch = logging.StreamHandler()
         ch.setFormatter(formatter)
         fh = logging.FileHandler(path)
@@ -68,20 +73,23 @@ class Logger(Config):
 
 logger = Logger().get_logger()
 
+
 class Driver(Config):
 
     def __init__(self, width, height):
 
         chrome_options = Options()
-        # Hide the chromedriver
+
         if not self.DEBUG or self.path == '/code':
+            chrome_options.add_experimental_option("detach", True)
             chrome_options.add_argument('--headless')
             chrome_options.add_argument('--start-maximized')
             chrome_options.add_argument('disable-infobars')
             chrome_options.add_argument('--disable-extensions')
             chrome_options.add_argument('--no-sandbox')
             chrome_options.add_argument('--disable-dev-shm-usage')
-        self.driver = webdriver.Chrome('chromedriver',options=chrome_options)
+        self.driver = webdriver.Chrome(
+            executable_path="D:/progs/python/crawler_shopee/chromedriver.exe", options=chrome_options)
         self.driver.set_window_size(width, height)
         self.path = os.path.dirname(os.path.abspath(__file__))
         print("Init driver done.")
@@ -104,6 +112,10 @@ class Driver(Config):
             selector = By.CSS_SELECTOR
             target = self.elements_by_css.get(target)
 
+        if method == 'text':
+            selector = By.XPATH
+            target = self.elements_by_text.get(target)
+
         WebDriverWait(self.driver, self.WAIT_TIMEOUT).until(
             EC.presence_of_element_located((selector, target))
         )
@@ -115,8 +127,15 @@ class Driver(Config):
         if method == 'name':
             target = self.elements_by_name.get(target)
             result = self.driver.find_elements_by_name(target)
+        if method == 'text':
+            target = self.elements_by_text.get(target)
+            result = self.driver.find_elements_by_xpath(target)
 
-        logger.debug(result)
+        try:
+            logger.debug(result[0])
+        except:
+            logger.debug(result)
+
         return result[0] if len(result) is 1 else result
 
 
@@ -131,7 +150,7 @@ class Crawler(Driver, Config):
             pop = self.find("css", "POP_MODAL")
             pop.click()
             logger.info("pop modal close")
-        except :
+        except:
             logger.info("pop modal not found")
 
     def checkLogin(self):
@@ -153,10 +172,9 @@ class Crawler(Driver, Config):
 
     def loginByPass(self):
         try:
-            # click to show login modal
             login_button = self.find("css", "NAV_LOGIN_MODAL")[1]
             login_button.click()
-            self.wait_until("css", "LOGIN_SUBMIT")
+            self.wait_until("text", "LOGIN_SUBMIT")
         except Exception as e:
             logger.error("Login Modal not showing"+repr(e))
             self.close()
@@ -164,11 +182,17 @@ class Crawler(Driver, Config):
             # Enter Account & Password
             accountText = self.find("name", "LOGIN_USER")
             passwordText = self.find("name", "LOGIN_PASS")
-            submitButtom = self.find("css", "LOGIN_SUBMIT")
+            submitButtom = self.find("text", "LOGIN_SUBMIT")
 
             accountText.send_keys(text_username)
             passwordText.send_keys(text_password)
-            submitButtom.click()
+
+            count = 0
+            while self.find("text", "LOGIN_SUBMIT") and count < 3:
+                submitButtom.click()
+                count += 1
+                sleep(5)
+
             logger.info("Use password to login")
         except Exception as e:
             logger.error("Wrong account and password"+repr(e))
@@ -177,9 +201,7 @@ class Crawler(Driver, Config):
 
     def checkSMS(self):
         try:
-            # Check SMS textbox exists
             self.wait_until("css", "SMS_MODAL")
-            # Catch text & submit buttom
             smsText = self.find("css", "SMS_TEXT")
             smsSubmit = self.find("css", "SMS_SUBMIT")
 
@@ -187,12 +209,9 @@ class Crawler(Driver, Config):
             smsText.clear()
             smsText.send_keys(text_sms)
             smsSubmit.click()
-            # handle sms error
             try:
-                # wait to check if login success
                 self.wait_until("css", "AVATAR")
             except:
-                #login failed
                 smsError = self.find("css", "LOGIN_FAILED")
                 if len(smsError) > 0:
                     logger.error("Sending SMS code "+smsError[0].text)
@@ -205,27 +224,35 @@ class Crawler(Driver, Config):
 
     def clickCoin(self):
         try:
-            # wait for page loading
             self.getRequest("COIN_PAGE")
-            self.wait_until("css", "COIN_PAGE_READY")
+            logger.debug("wait_until COIN_PAGE_READY")
+            self.wait_until("text", "COIN_PAGE_READY")
             try:
-                self.wait_until("css", "GET_COIN")
-                # get information
-                current_coin = self.find("css", "COIN_NOW")
-                get_coin = self.find("css", "GET_COIN")
-                #show before information
-                logger.info("目前有：" + current_coin.text + " 蝦幣，" + get_coin.text)
-                #click to get shopee coin
+                logger.debug("wait_until GET_COIN")
+                self.wait_until("text", "GET_COIN")
+                logger.debug("find COIN_NOW")
+                current_coin = self.find("text", "COIN_NOW")
+                logger.debug(current_coin)
+                logger.debug("find get_coin")
+                get_coin = self.find("text", "GET_COIN")
+                logger.debug(get_coin)
+
+                logger.info("目前有：" + current_coin.text +
+                            " 蝦幣，" + get_coin.text)
+
+                logger.debug("click get_coin")
                 get_coin.click()
-            except:
-                # Already click
+            except Exception as e:
+                logger.error(str(e))
                 logger.info("今天已經獲取過蝦幣")
-            #wait for already information display login-check-btn
-            self.wait_until("css", "COIN_REGULAR")
-            #show after information
-            current_coin = self.find("css", "COIN_NOW")
-            coin_regular = self.find("css", "COIN_REGULAR")
-            logger.info("目前有：" + current_coin.text + " 蝦幣，" + coin_regular.text)
+
+            logger.debug("wait_until COIN_REGULAR")
+            self.wait_until("text", "COIN_REGULAR")
+            current_coin = self.find("text", "COIN_NOW")
+            logger.debug("find COIN_REGULAR")
+            coin_regular = self.find("text", "COIN_REGULAR")
+            logger.info("目前有：" + current_coin.text +
+                        " 蝦幣，" + coin_regular.text)
         except Exception as e:
             logger.error(repr(e))
             self.close()
@@ -233,17 +260,13 @@ class Crawler(Driver, Config):
     def run(self):
         self.getRequest("INDEX")
         self.checkPopModal()
-        #Use cookie to login
         self.loginByCookie(cookie_name)
         if not self.checkLogin():
-            #Use pass to login
             self.loginByPass()
             if not self.checkLogin():
                 self.checkSMS()
                 if not self.checkLogin():
-                    #Login failed
                     self.close()
-        #After login, Go to coin page
         self.saveCookie(cookie_name)
         self.clickCoin()
         self.close()
