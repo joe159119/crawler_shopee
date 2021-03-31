@@ -200,9 +200,14 @@ class Crawler(Driver, Config):
 
     def checkSMS(self):
         try:
+            logger.info("wait_until SMS_MODAL")
             self.wait_until("text", "SMS_MODAL")
+            logger.info("find SMS_TEXT")
             smsText = self.find("text", "SMS_TEXT")
+            logger.info(smsText)
+            logger.info("find SMS_SUBMIT")
             smsSubmit = self.find("text", "SMS_SUBMIT")
+            logger.info(smsSubmit)
 
             text_sms = input("Please Enter SMS code in 60 seconds: ")
             smsText.clear()
