@@ -210,7 +210,7 @@ class Crawler(Driver, Config):
             logger.info(smsSubmit)
 
             text_sms = input("Please Enter SMS code in 60 seconds: ")
-            smsText.clear()
+            # smsText.clear()
             logger.info("send_keys smsText")
             smsText.send_keys(text_sms)
             logger.info(smsText)
