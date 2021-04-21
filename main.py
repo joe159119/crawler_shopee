@@ -172,8 +172,9 @@ class Crawler(Driver, Config):
 
     def loginByPass(self):
         try:
-            login_button = self.find("text", "NAV_LOGIN_MODAL")
-            login_button.click()
+            login_page_url = self.find(
+                "text", "NAV_LOGIN_MODAL").getAttribute('href')
+            self.driver.get(login_page_url)
             self.wait_until("text", "LOGIN_SUBMIT")
         except Exception as e:
             logger.error("Login Modal not showing"+repr(e))
