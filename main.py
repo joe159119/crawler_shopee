@@ -172,7 +172,7 @@ class Crawler(Driver, Config):
 
     def loginByPass(self):
         try:
-            login_button = self.find("text", "NAV_LOGIN_MODAL")[1]
+            login_button = self.find("text", "NAV_LOGIN_MODAL")
             login_button.click()
             self.wait_until("text", "LOGIN_SUBMIT")
         except Exception as e:
