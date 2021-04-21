@@ -31,6 +31,7 @@ class Config:
         "LOGIN_PASS": "password"
     }
     elements_by_text = {
+        "NAV_LOGIN_MODAL": "//div/ul/a[text()=\"登入\"]",
         "LOGIN_SUBMIT": "//button[text()=\"登入\"]",
         "SMS_MODAL": "//div[contains(., '請輸入驗證碼')]",
         "SMS_TEXT": "//input[contains(@autocomplete, 'one-time-code')]",
@@ -171,9 +172,11 @@ class Crawler(Driver, Config):
 
     def loginByPass(self):
         try:
-            login_button = self.find("css", "NAV_LOGIN_MODAL")[1]
+            login_button = self.find("text", "NAV_LOGIN_MODAL")[1]
             login_button.click()
             self.wait_until("text", "LOGIN_SUBMIT")
+            print("yes")
+            return True
         except Exception as e:
             logger.error("Login Modal not showing"+repr(e))
             self.close()
