@@ -1,0 +1,5 @@
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=root
+0 10 * * * sleep $[($RANDOM\%120)+1]m && bash {your_file_path}/autorun.sh > {set_a_path_to_save_log_file}/cron.log 2>&1 &
+
