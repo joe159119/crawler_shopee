@@ -173,7 +173,7 @@ class Crawler(Driver, Config):
     def loginByPass(self):
         try:
             login_page_url = self.find(
-                "text", "NAV_LOGIN_MODAL").getAttribute('href')
+                "text", "NAV_LOGIN_MODAL").get_attribute('href')
             self.driver.get(login_page_url)
             self.wait_until("text", "LOGIN_SUBMIT")
         except Exception as e:
