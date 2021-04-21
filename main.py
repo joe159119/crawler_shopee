@@ -175,8 +175,6 @@ class Crawler(Driver, Config):
             login_button = self.find("text", "NAV_LOGIN_MODAL")[1]
             login_button.click()
             self.wait_until("text", "LOGIN_SUBMIT")
-            print("yes")
-            return True
         except Exception as e:
             logger.error("Login Modal not showing"+repr(e))
             self.close()
