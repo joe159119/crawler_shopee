@@ -31,7 +31,7 @@ class Config:
         "LOGIN_PASS": "password"
     }
     elements_by_text = {
-        "NAV_LOGIN_MODAL": "//div/ul/a[text()=\"登入\"]",
+        "NAV_LOGIN_MODAL": "//div/ul/a[contains(., '登入')]",
         "LOGIN_SUBMIT": "//button[text()=\"登入\"]",
         "SMS_MODAL": "//div[contains(., '請輸入驗證碼')]",
         "SMS_TEXT": "//input[contains(@autocomplete, 'one-time-code')]",
