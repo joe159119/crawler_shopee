@@ -11,6 +11,9 @@ I saw [charlie0227](https://github.com/charlie0227)/[crawler_shopee](https://git
 but after the Shopee website was updated, it became unavailable,
 so I rewritten it to make it work normally.
 
+## System requirment
+Linux base OS with Docker, Python3 and Cronta (Or another scheduling tool to automatic running).
+
 ## dependencies
     python==3.6
     selenium==3.8.0
