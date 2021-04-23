@@ -2,6 +2,7 @@
 ![CI status](https://img.shields.io/badge/build-passing-brightgreen.svg)
 
 Shopee coin getter is a script to collect daily shopee coins.
+This version is only available for Chinese Traditionanl Shopee Website.
 
 ![alt text](https://raw.githubusercontent.com/joe159119/crawler_shopee/master/readme/overall-1.png)
 
@@ -33,7 +34,7 @@ so I rewritten it to make it work normally.
 build a docker image and run it
 
     docker build -t shopee:latest .
-    docker run -it --rm -v <your-path>/crawler_shopee:/code shopee sh -c "python main.py"
+    docker run --rm -v <your-path>/crawler_shopee:/code shopee sh -c "python main.py"
 
 You'll need to enter SMS authenticate first time if used password to login
 
@@ -86,6 +87,9 @@ __clickCoin()__
 
 Last, goto https://shopee.tw/shopee-coins to own your shopee daily coin after login.
 
+## Known issues
+
+Testing...
 
 ## License
 
