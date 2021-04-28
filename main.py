@@ -4,7 +4,7 @@ import pickle
 import logging
 import datetime
 import inspect
-from env import *
+import csv
 from time import gmtime, strftime, sleep
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -138,6 +138,17 @@ class Driver(Config):
 
         return result[0] if len(result) is 1 else result
 
+    def get_userlist_csv(self):
+        userlist = []
+        with open('env.csv', newline='') as csvfile:
+
+            rows = csv.reader(csvfile)
+
+            for row in rows:
+                userlist.append(row)
+
+        return userlist
+
 
 class Crawler(Driver, Config):
 
@@ -170,7 +181,7 @@ class Crawler(Driver, Config):
         except Exception as e:
             logger.info("{} not found".format(cookieName))
 
-    def loginByPass(self):
+    def loginByPass(self, username, password):
         try:
             login_page_url = self.find(
                 "text", "NAV_LOGIN_MODAL").get_attribute('href')
@@ -185,8 +196,8 @@ class Crawler(Driver, Config):
             passwordText = self.find("name", "LOGIN_PASS")
             submitButtom = self.find("text", "LOGIN_SUBMIT")
 
-            accountText.send_keys(text_username)
-            passwordText.send_keys(text_password)
+            accountText.send_keys(username)
+            passwordText.send_keys(password)
 
             count = 0
             while self.find("text", "LOGIN_SUBMIT") and count < 3:
@@ -266,25 +277,42 @@ class Crawler(Driver, Config):
             self.close()
 
     def run(self):
-        self.getRequest("INDEX")
-        self.checkPopModal()
-        self.loginByCookie(cookie_name)
-        if not self.checkLogin():
-            self.loginByPass()
+        userlist = self.get_userlist_csv()
+
+        for user in userlist:
+            super().__init__(1200, 800)
+            username = user[0]
+            password = user[1]
+
+            cookie_name = str(username) + '.pkl'
+
+            logger.info("login user: %s" % (username))
+
+            self.getRequest("INDEX")
+            self.checkPopModal()
+            self.loginByCookie(cookie_name)
             if not self.checkLogin():
-                sleep(3)
-                self.checkSMS()
+                self.loginByPass(username, password)
                 if not self.checkLogin():
-                    self.close()
-        self.saveCookie(cookie_name)
-        self.clickCoin()
-        self.close()
+                    sleep(3)
+                    self.checkSMS()
+                    if not self.checkLogin():
+                        self.close()
+                        logger.error(
+                            "Login Failed. Your account or password seems to be wrong.")
+                        break
+            self.saveCookie(cookie_name)
+            self.clickCoin()
+            self.close()
+
+            sleep(1)
 
     def close(self):
         self.driver.close()
-        logger.info("Program exit")
-        sys.exit(0)
+        logger.info("driver close")
 
 
 if __name__ == "__main__":
     Crawler().run()
+    logger.info("Program exit")
+    sys.exit(0)
