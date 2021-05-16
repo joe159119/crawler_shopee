@@ -277,35 +277,29 @@ class Crawler(Driver, Config):
             self.close()
 
     def run(self):
-        userlist = self.get_userlist_csv()
+        super().__init__(1200, 800)
+        username = input("username: ")
+        password = input("password: ")
 
-        for user in userlist:
-            super().__init__(1200, 800)
-            username = user[0]
-            password = user[1]
+        cookie_name = str(username) + '.pkl'
 
-            cookie_name = str(username) + '.pkl'
+        logger.info("login user: %s" % (username))
 
-            logger.info("login user: %s" % (username))
-
-            self.getRequest("INDEX")
-            self.checkPopModal()
-            self.loginByCookie(cookie_name)
+        self.getRequest("INDEX")
+        self.checkPopModal()
+        self.loginByCookie(cookie_name)
+        if not self.checkLogin():
+            self.loginByPass(username, password)
             if not self.checkLogin():
-                self.loginByPass(username, password)
+                sleep(3)
+                self.checkSMS()
                 if not self.checkLogin():
-                    sleep(3)
-                    self.checkSMS()
-                    if not self.checkLogin():
-                        self.close()
-                        logger.error(
-                            "Login Failed. Your account or password seems to be wrong.")
-                        break
-            self.saveCookie(cookie_name)
-            self.clickCoin()
-            self.close()
-
-            sleep(60)
+                    self.close()
+                    logger.error(
+                        "Login Failed. Your account or password seems to be wrong.")
+                    break
+        self.saveCookie(cookie_name)
+        self.close()
 
     def close(self):
         self.driver.close()

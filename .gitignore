@@ -1,6 +1,0 @@
-.DS_Store
-cookie*
-__pycache__/
-env.py
-log/
-chromedriver
