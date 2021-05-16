@@ -13,6 +13,7 @@ so I rewritten it to make it work normally.
 
 ## System requirment
 Linux base OS with Docker, Python3 and Cronta (Or another scheduling tool to automatic running).
+A computer with GUI to login first time. (See Important section below.)
 
 ## dependencies
     python==3.6
@@ -21,16 +22,24 @@ Linux base OS with Docker, Python3 and Cronta (Or another scheduling tool to aut
 ## Installation
  [Docker](https://www.docker.com)
 
+## Important
+    Because Shopee add new login verification, you need to login manually first time use "login.py", you should be send SMS code to verification your login.(!!! You need to entry the SMS code using console, NOT WEBSITE!!!) The program will save cookies to cookies directory. After that, the program can login through cookie to bypass login verification.
+
+    You can do this on Windows or another OS with GUI and then copy the cookie to cookies directory.
+
 ## Getting Started
     git clone https://github.com/joe159119/crawler_shopee.git
     cd crawler_shopee
+    mkdir cookies
     cp env.py.sample env.py
 
-	Filled in your username and password in env.py
+	Filled in your username and password in env.csv like below:
 
-    text_username = "<your shopee username>"
-    text_password = "<your shopee password>"
-    cookie_name = "cookie.pkl"
+    account1,password1
+    account2,password2
+
+    You can enter user more than one in the env.csv, or just one user.
+    Note: Don't add space to csv file. Leave a line with one ',' between account and password.
 
 ## Usage
 
