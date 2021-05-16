@@ -173,14 +173,6 @@ class Crawler(Driver, Config):
             logger.info("Login Failed")
             return False
 
-    def loginByCookie(self, cookieName):
-        try:
-            self.loadCookie(cookieName)
-            self.driver.refresh()
-            logger.info("Use {} to login".format(cookieName))
-        except Exception as e:
-            logger.info("{} not found".format(cookieName))
-
     def loginByPass(self, username, password):
         try:
             login_page_url = self.find(
@@ -199,104 +191,35 @@ class Crawler(Driver, Config):
             accountText.send_keys(username)
             passwordText.send_keys(password)
 
-            count = 0
-            while self.find("text", "LOGIN_SUBMIT") and count < 3:
-                submitButtom.click()
-                count += 1
-                sleep(5)
+            logger.info("Use password to login. Wait SMS for 10 seconds...")
+            logger.info(
+                "You need to click login button manually and complete the login validation.")
+            sleep(10)
+            input('Press any key to continue.')
 
-            logger.info("Use password to login")
         except Exception as e:
             logger.error("Wrong account and password"+repr(e))
             self.close()
             sys.exit(0)
 
-    def checkSMS(self):
-        try:
-            logger.debug("wait_until SMS_MODAL")
-            self.wait_until("text", "SMS_MODAL")
-            logger.debug("find SMS_TEXT")
-            smsText = self.find("text", "SMS_TEXT")
-            logger.debug(smsText)
-            logger.debug("find SMS_SUBMIT")
-            smsSubmit = self.find("text", "SMS_SUBMIT")
-            logger.debug(smsSubmit)
-
-            text_sms = input("Please Enter SMS code in 60 seconds: ")
-            # smsText.clear()
-            logger.debug("send_keys smsText")
-            smsText.send_keys(text_sms)
-            logger.debug(smsText)
-            smsSubmit.click()
-            try:
-                self.wait_until("css", "AVATAR")
-            except:
-                smsError = self.find("css", "LOGIN_FAILED")
-                if len(smsError) > 0:
-                    logger.error("Sending SMS code "+smsError[0].text)
-                else:
-                    logger.error("Sending SMS code Run time out.")
-                self.close()
-                sys.exit(0)
-        except Exception as e:
-            logger.info("No need SMS authenticate"+repr(e))
-
-    def clickCoin(self):
-        try:
-            self.getRequest("COIN_PAGE")
-            logger.debug("wait_until COIN_PAGE_READY")
-            self.wait_until("text", "COIN_PAGE_READY")
-            try:
-                logger.debug("wait_until GET_COIN")
-                self.wait_until("text", "GET_COIN")
-                logger.debug("find COIN_NOW")
-                current_coin = self.find("text", "COIN_NOW")
-                logger.debug(current_coin)
-                logger.debug("find get_coin")
-                get_coin = self.find("text", "GET_COIN")
-                logger.debug(get_coin)
-
-                logger.info("目前有：" + current_coin.text +
-                            " 蝦幣，" + get_coin.text)
-
-                logger.debug("click get_coin")
-                get_coin.click()
-            except Exception as e:
-                logger.error(str(e))
-                logger.info("今天已經獲取過蝦幣")
-
-            logger.debug("wait_until COIN_REGULAR")
-            self.wait_until("text", "COIN_REGULAR")
-            current_coin = self.find("text", "COIN_NOW")
-            logger.debug("find COIN_REGULAR")
-            coin_regular = self.find("text", "COIN_REGULAR")
-            logger.info("目前有：" + current_coin.text +
-                        " 蝦幣，" + coin_regular.text)
-        except Exception as e:
-            logger.error(repr(e))
-            self.close()
-
     def run(self):
-        super().__init__(1200, 800)
-        username = input("username: ")
-        password = input("password: ")
-
-        cookie_name = str(username) + '.pkl'
-
-        logger.info("login user: %s" % (username))
-
         self.getRequest("INDEX")
         self.checkPopModal()
-        self.loginByCookie(cookie_name)
+        logger.info("You need to input user information in console.")
+        username = input('username: ')
+        password = input('password: ')
+        self.loginByPass(username, password)
         if not self.checkLogin():
-            self.loginByPass(username, password)
+            sleep(3)
+            logger.info(
+                "Enter the SMS and click button to send it. Wait 3 seconeds...")
+            sleep(3)
+            input('Press any key to continue.')
             if not self.checkLogin():
-                sleep(3)
-                self.checkSMS()
-                if not self.checkLogin():
-                    self.close()
-                    logger.error(
-                        "Login Failed. Your account or password seems to be wrong.")
+                self.close()
+                logger.error(
+                    "Login Failed. Your account or password seems to be wrong.")
+        cookie_name = username + '.pkl'
         self.saveCookie(cookie_name)
         self.close()
 
