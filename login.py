@@ -297,7 +297,6 @@ class Crawler(Driver, Config):
                     self.close()
                     logger.error(
                         "Login Failed. Your account or password seems to be wrong.")
-                    break
         self.saveCookie(cookie_name)
         self.close()
 
