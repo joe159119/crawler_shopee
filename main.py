@@ -292,19 +292,16 @@ class Crawler(Driver, Config):
             self.checkPopModal()
             self.loginByCookie(cookie_name)
             if not self.checkLogin():
-                self.loginByPass(username, password)
-                if not self.checkLogin():
-                    sleep(3)
-                    self.checkSMS()
-                    if not self.checkLogin():
-                        self.close()
-                        logger.error(
-                            "Login Failed. Your account or password seems to be wrong.")
-                        break
+                self.close()
+                logger.error(
+                    "Login Failed. Your account or password seems to be wrong.")
+                break
             self.saveCookie(cookie_name)
             self.clickCoin()
             self.close()
 
+            logger.info(
+                "Wait 60 seconds and then login another user...")
             sleep(60)
 
     def close(self):
