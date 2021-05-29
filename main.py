@@ -39,7 +39,8 @@ class Config:
         "COIN_PAGE_READY": "//main/section/div/div[text()=\"蝦幣獎勵\"]",
         "GET_COIN": "//main/section/div/button",
         "COIN_NOW": "//main/section/div/a/p",
-        "COIN_REGULAR": "//button[contains(., '明天再回來領取')]"
+        "COIN_REGULAR": "//button[contains(., '明天再回來領取')]",
+        "Home_page": "//div[contains(@class, 'home-page')]"
     }
     urls = {
         "INDEX": "https://shopee.tw",
@@ -166,9 +167,10 @@ class Crawler(Driver, Config):
 
     def checkLogin(self):
         try:
-            self.wait_until("css", "AVATAR")
+            self.wait_until("text", "Home_page")
             logger.info("Login Success")
             return True
+
         except Exception as e:
             logger.info("Login Failed")
             return False
